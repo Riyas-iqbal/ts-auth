@@ -1,9 +1,9 @@
 
-import config from "@src/config"
-import { ClientError } from "@src/exceptions/clientError"
-import { UnauthorizedError } from "@src/exceptions/unauthorizedError"
-import { CustomRequest } from "@src/middlewares/checkJwt"
-import { changePassword, getUserByUsername, isPasswordCorrect } from "@src/state/users"
+import config from "../config"
+import { ClientError } from "../exceptions/clientError"
+import { UnauthorizedError } from "../exceptions/unauthorizedError"
+import { CustomRequest } from "../middlewares/checkJwt"
+import { changePassword, getUserByUsername, isPasswordCorrect } from "../state/users"
 import { Response, Request } from "express"
 import { sign } from "jsonwebtoken"
 

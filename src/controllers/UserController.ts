@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { getAllUsers, Roles, getUser, createUser, updateUser, deleteUser } from '../state/users';
 import { ClientError } from '../exceptions/clientError';
+import { CustomRequest } from '../middlewares/checkJwt';
+import { ForbiddenError } from '../exceptions/forbiddenError';
 
 class UserController {
     static listAll = async (req: Request, res: Response, next: NextFunction) => {
@@ -13,6 +15,12 @@ class UserController {
     static getOneById = async (req: Request, res: Response, next: NextFunction) => {
         // Get the ID from the URL.
         const id: string = req.params.id;
+
+        // New code: Restrict USER requestors to retrieve their own record.
+        // Allow ADMIN requestors to retrieve any record.
+        if ((req as CustomRequest).token.payload.role === Roles.USER && req.params.id !== (req as CustomRequest).token.payload.userId) {
+            throw new ForbiddenError('Not enough permissions');
+        }
 
         // Get the user with the requested ID.
         const user = getUser(id);
@@ -37,11 +45,23 @@ class UserController {
         // Get the user ID.
         const id = req.params.id;
 
+        // New code: Restrict USER requestors to edit their own record.
+        // Allow ADMIN requestors to edit any record.
+        if ((req as CustomRequest).token.payload.role === Roles.USER && req.params.id !== (req as CustomRequest).token.payload.userId) {
+            throw new ForbiddenError('Not enough permissions');
+        }
+
         // Get values from the body.
         const { username, role } = req.body;
 
-        if (!Object.values(Roles).includes(role))
-            throw new ClientError('Invalid role');
+        // New code: Do not allow USERs to change themselves to an ADMIN.
+        // Verify you cannot make yourself an ADMIN if you are a USER.
+        if ((req as CustomRequest).token.payload.role === Roles.USER && role === Roles.ADMIN) {
+            throw new ForbiddenError('Not enough permissions');
+        }
+        // Verify the role is correct.
+        else if (!Object.values(Roles).includes(role)) 
+             throw new ClientError('Invalid role');
 
         // Retrieve and update the user record.
         const user = getUser(id);

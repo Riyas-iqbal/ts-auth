@@ -1,4 +1,4 @@
-import { checkJwt } from "@src/middlewares/checkJwt";
+import { checkJwt } from "../middlewares/checkJwt";
 import AuthController from "../controllers/AuthControllers";
 import { asyncHandler } from "../middlewares/asyncHandler";
 import { Router } from "express";
