@@ -1,4 +1,4 @@
-import config from '@src/config';
+import config from '../config';
 import { Request, Response, NextFunction } from 'express';
 import { JwtPayload, verify } from 'jsonwebtoken';
 
